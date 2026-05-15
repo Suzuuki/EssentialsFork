@@ -22,6 +22,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.sql.Connection;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -151,4 +152,7 @@ public interface IEssentials extends Plugin {
     }
 
     AdventureFacet getAdventureFacet();
+
+    /** Slon fork: shared CombatLib MySQL connection (used for cross-server kit cooldown sync). */
+    Connection getConnection();
 }

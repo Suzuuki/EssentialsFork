@@ -1127,7 +1127,9 @@ public class User extends UserData implements Comparable<User>, IMessageRecipien
     @Override
     public void sendMessage(final String message) {
         if (!message.isEmpty()) {
-            base.sendMessage(message);
+            // Slon fork: pipe plain sendMessage through MiniMessage so clickable
+            // tags in custom translations (e.g. typeTpaccept) work everywhere.
+            sendComponent(ess.getAdventureFacet().deserializeMiniMessage(message));
         }
     }
 

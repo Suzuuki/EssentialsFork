@@ -31,7 +31,24 @@ public class Commandrepair extends EssentialsCommand {
         } else if (args[0].equalsIgnoreCase("all")) {
             final Trade charge = new Trade("repair-all", ess);
             charge.isAffordableFor(user);
-            repairAll(user);
+
+            // Slon fork: /repair all <player> — repair another player's inventory.
+            // Permission used: essentials.repair.others.
+            // The cost is still charged to the caller. Armor/enchant repair flags are
+            // resolved against the caller's own permissions so a staffer's perms apply
+            // regardless of the target.
+            User target = user;
+            if (args.length > 1 && user.isAuthorized("essentials.repair.others")) {
+                try {
+                    target = getPlayer(server, user, args, 1);
+                } catch (final PlayerNotFoundException ignored) {
+                    // fall back to self if the named player isn't found
+                }
+            }
+
+            final boolean repairArmor = user.isAuthorized("essentials.repair.armor");
+            final boolean repairEnchanted = ess.getSettings().getRepairEnchanted() || user.isAuthorized("essentials.repair.enchanted");
+            repairAll(user, target, repairArmor, repairEnchanted);
             charge.charge(user);
         } else {
             throw new NotEnoughArgumentsException();
@@ -61,18 +78,28 @@ public class Commandrepair extends EssentialsCommand {
     }
 
     public void repairAll(final User user) throws Exception {
-        final List<String> repaired = new ArrayList<>();
-        repairItems(Inventories.getInventory(user.getBase(), false), user, repaired);
+        repairAll(user, user, user.isAuthorized("essentials.repair.armor"),
+                ess.getSettings().getRepairEnchanted() || user.isAuthorized("essentials.repair.enchanted"));
+    }
 
-        if (user.isAuthorized("essentials.repair.armor")) {
-            repairItems(user.getBase().getInventory().getArmorContents(), user, repaired);
+    /**
+     * Slon fork: repair {@code target}'s inventory while charging {@code payer}.
+     * The {@code repairArmor} / {@code repairEnchanted} flags are resolved by the caller
+     * (typically from the payer's permissions) so repair scope follows staff authority.
+     */
+    public void repairAll(final User payer, final User target, final boolean repairArmor, final boolean repairEnchanted) throws Exception {
+        final List<String> repaired = new ArrayList<>();
+        repairItems(Inventories.getInventory(target.getBase(), false), payer, repaired, repairEnchanted);
+
+        if (repairArmor) {
+            repairItems(target.getBase().getInventory().getArmorContents(), payer, repaired, repairEnchanted);
         }
 
-        user.getBase().updateInventory();
+        target.getBase().updateInventory();
         if (repaired.isEmpty()) {
             throw new TranslatableException("repairNone");
         } else {
-            user.sendTl("repair", StringUtil.joinList(repaired));
+            payer.sendTl("repair", StringUtil.joinList(repaired));
         }
     }
 
@@ -90,6 +117,10 @@ public class Commandrepair extends EssentialsCommand {
     }
 
     private void repairItems(final ItemStack[] items, final IUser user, final List<String> repaired) {
+        repairItems(items, user, repaired, ess.getSettings().getRepairEnchanted() || user.isAuthorized("essentials.repair.enchanted"));
+    }
+
+    private void repairItems(final ItemStack[] items, final IUser user, final List<String> repaired, final boolean repairEnchanted) {
         for (final ItemStack item : items) {
             if (item == null || item.getType().isBlock() || MaterialUtil.getDamage(item) == 0) {
                 continue;
@@ -104,7 +135,7 @@ public class Commandrepair extends EssentialsCommand {
                 user.sendMessage(ex.getMessage());
                 continue;
             }
-            if (!item.getEnchantments().isEmpty() && !ess.getSettings().getRepairEnchanted() && !user.isAuthorized("essentials.repair.enchanted")) {
+            if (!item.getEnchantments().isEmpty() && !repairEnchanted) {
                 continue;
             }
 
@@ -140,6 +171,9 @@ public class Commandrepair extends EssentialsCommand {
                 options.add("all");
             }
             return options;
+        } else if (args.length == 2 && "all".equalsIgnoreCase(args[0]) && user.isAuthorized("essentials.repair.others")) {
+            // Slon fork: complete target player names for /repair all <player>
+            return getPlayers(user);
         } else {
             return Collections.emptyList();
         }

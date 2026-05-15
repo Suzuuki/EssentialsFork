@@ -364,6 +364,27 @@ skip-used-one-time-kits-from-kit-list: false
 # When enabled, armor from kits will automatically be equipped as long as the player's armor slots are empty.
 kit-auto-equip: false
 
+# ============================================================================
+# Slon fork — optional plugin integrations.
+# All of these default to OFF: with no plugins installed and no toggles changed,
+# this build behaves like vanilla EssentialsX. Each toggle gates a single hook
+# and is also guarded at runtime by a plugin-installed check, so flipping a
+# toggle on without the plugin present is a no-op (not a crash).
+# ============================================================================
+slon-fork:
+  # Block kit usage during a wipe / pre-release window. Requires the KitBlocker plugin.
+  # While active, /kit <name> is refused with the kitBlocked message, except for the
+  # "start" kit which is always allowed so players can claim their starter gear.
+  kit-blocker-enabled: false
+
+  # Refuse /sethome inside other players' RegionProtect regions (the player must be
+  # an owner/member/allowed user). Requires the RegionProtect plugin.
+  sethome-region-protect-enabled: false
+
+  # Refuse /sethome inside WorldGuard regions whose `use-sethome` flag is not set.
+  # Requires the WGSetHomeHook plugin (which registers the WG flag).
+  sethome-wg-flag-enabled: false
+
 # Determines the functionality of the /createkit command.
 # If this is true, /createkit will give the user a link with the kit code.
 # If this is false, /createkit will add the kit to the 'kits.yml' config file directly.

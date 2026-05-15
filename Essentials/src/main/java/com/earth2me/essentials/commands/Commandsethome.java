@@ -2,6 +2,8 @@ package com.earth2me.essentials.commands;
 
 import com.earth2me.essentials.CommandSource;
 import com.earth2me.essentials.User;
+import com.earth2me.essentials.hooks.RegionProtectHook;
+import com.earth2me.essentials.hooks.WGSetHomeHookBridge;
 import com.earth2me.essentials.utils.LocationUtil;
 import com.earth2me.essentials.utils.NumberUtil;
 import net.ess3.api.TranslatableException;
@@ -54,6 +56,18 @@ public class Commandsethome extends EssentialsCommand {
         final Location location = user.getLocation();
         if ((!ess.getSettings().isTeleportSafetyEnabled() || !ess.getSettings().isForceDisableTeleportSafety()) && LocationUtil.isBlockUnsafeForUser(ess, usersHome, location.getWorld(), location.getBlockX(), location.getBlockY(), location.getBlockZ())) {
             throw new TranslatableException("unsafeTeleportDestination", location.getWorld().getName(), location.getBlockX(), location.getBlockY(), location.getBlockZ());
+        }
+
+        // Slon fork: optional sethome region checks. Both hooks short-circuit safely
+        // when the underlying plugin is absent or the toggle is off, so vanilla
+        // EssentialsX behavior is preserved by default.
+        //   - RegionProtect: deny when standing inside a region the player is not a member/owner of
+        //   - WGSetHomeHook: deny when standing inside a WorldGuard region that does not allow `use-sethome`
+        if (ess.getSettings().isSetHomeRegionProtectEnabled() && !RegionProtectHook.hasAccess(user.getBase(), location)) {
+            throw new TranslatableException("homeNotAccess");
+        }
+        if (ess.getSettings().isSetHomeWGFlagEnabled() && WGSetHomeHookBridge.isSetHomeBlocked(location)) {
+            throw new TranslatableException("homeNotAccess");
         }
 
         if (ess.getSettings().isConfirmHomeOverwrite() && usersHome.hasHome(name) && (!name.equals(usersHome.getLastHomeConfirmation()) || name.equals(usersHome.getLastHomeConfirmation()) && System.currentTimeMillis() - usersHome.getLastHomeConfirmationTimestamp() > TimeUnit.MINUTES.toMillis(2))) {

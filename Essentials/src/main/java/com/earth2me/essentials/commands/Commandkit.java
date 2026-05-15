@@ -4,9 +4,12 @@ import com.earth2me.essentials.CommandSource;
 import com.earth2me.essentials.Kit;
 import com.earth2me.essentials.User;
 import com.earth2me.essentials.adventure.AdventureUtil;
+import com.earth2me.essentials.hooks.KitBlockerHook;
 import com.earth2me.essentials.utils.StringUtil;
 import net.ess3.api.TranslatableException;
 import org.bukkit.Server;
+import org.bukkit.Sound;
+import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -42,7 +45,7 @@ public class Commandkit extends EssentialsCommand {
             final User userTo = getPlayer(server, args, 1, true, false);
 
             for (final String kitName : args[0].toLowerCase(Locale.ENGLISH).split(",")) {
-                new Kit(kitName, ess).expandItems(userTo);
+                Kit.get(kitName).expandItems(userTo);
 
                 sender.sendTl("kitGiveTo", kitName, userTo.getDisplayName());
                 userTo.sendTl("kitReceive", kitName);
@@ -55,6 +58,17 @@ public class Commandkit extends EssentialsCommand {
             throw new TranslatableException("kitNotFound");
         }
 
+        // Slon fork: KitBlocker integration. When kits are globally blocked
+        // (typically during a wipe window), refuse with a translated message
+        // and the "no" villager sound. The "start" kit is always exempt so
+        // players can still claim their starter kit during the lockout.
+        if (ess.getSettings().isKitBlockerEnabled() && !KitBlockerHook.canUseKits(userFrom.getBase()) && !kitNames.equalsIgnoreCase("start")) {
+            userFrom.sendTl("kitBlocked", KitBlockerHook.getRemainingTime());
+            final Player player = userFrom.getBase();
+            player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.4f, 1);
+            return;
+        }
+
         final List<Kit> kits = new ArrayList<>();
 
         for (final String kitName : kitNames.split(",")) {
@@ -62,7 +76,7 @@ public class Commandkit extends EssentialsCommand {
                 throw new TranslatableException("kitNotFound");
             }
 
-            final Kit kit = new Kit(kitName, ess);
+            final Kit kit = Kit.get(kitName);
             kit.checkPerms(userFrom);
             kit.checkDelay(userFrom);
             kit.checkAffordable(userFrom);

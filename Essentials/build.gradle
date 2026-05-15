@@ -8,6 +8,15 @@ dependencies {
     }
     compileOnly 'net.luckperms:api:5.3'
 
+    // Slon fork: local server-side plugin jars (compileOnly — provided at runtime by the server)
+    compileOnly files('D:/projects/CombatLib-1.16.5.jar')
+    compileOnly files('D:/projects/SimplePerms-1.0.jar')
+    compileOnly files('D:/projects/XEconomy-1.0.jar')
+    // Optional integrations (enabled via config + softdepend in plugin.yml)
+    compileOnly files('D:/projects/RegionProtect-1.0.jar')
+    compileOnly files('D:/projects/KitBlocker/target/KitBlocker-1.0.jar')
+    compileOnly files('D:/projects/WGSetHomeHook/target/WGSetHomeHook-1.0.jar')
+
     api 'io.papermc:paperlib:1.0.6'
 
     implementation 'org.spongepowered:configurate-yaml:4.2.0'

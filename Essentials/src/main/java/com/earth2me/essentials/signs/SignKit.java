@@ -45,7 +45,7 @@ public class SignKit extends EssentialsSign {
             final Trade charge = getTrade(sign, 3, ess);
             charge.isAffordableFor(player);
             try {
-                final Kit kit = new Kit(kitName, ess);
+                final Kit kit = Kit.get(kitName);
                 kit.checkDelay(player);
                 kit.setTime(player);
                 kit.expandItems(player);

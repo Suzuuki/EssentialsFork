@@ -22,19 +22,32 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 import static com.earth2me.essentials.I18n.tlLiteral;
 
 public class Kit {
+    // Slon fork: pre-parsed kit cache exposed to other plugins via Kit.get(name).
+    // Internal expandItems() still re-parses YAML per call so upstream features
+    // (slot:, keyword replacement, events) keep working.
+    private static final Map<String, Kit> cached = new ConcurrentHashMap<>();
+
     final IEssentials ess;
     final String kitName;
     final Map<String, Object> kit;
     final Trade charge;
+
+    private BigDecimal money = BigDecimal.ZERO;
+    private final List<ItemStack> itemStacks = new ArrayList<>();
+    private final List<String> commands = new ArrayList<>();
 
     public Kit(final String kitName, final IEssentials ess) throws Exception {
         this.kitName = kitName;
@@ -45,6 +58,113 @@ public class Kit {
         if (kit == null) {
             throw new TranslatableException("kitNotFound");
         }
+
+        parseCachedContents();
+    }
+
+    /**
+     * Pre-parses items/money/commands for external plugin access via the public API.
+     * Failures are logged and leave the lists empty — runtime kit claiming uses the
+     * full {@link #expandItems(User)} pipeline which re-parses items each time.
+     */
+    private void parseCachedContents() {
+        try {
+            final boolean allowUnsafe = ess.getSettings().allowUnsafeEnchantments();
+            final String currencySymbol = ess.getSettings().getCurrencySymbol().isEmpty() ? "$" : ess.getSettings().getCurrencySymbol();
+            for (String kitItem : getItemsSilently()) {
+                if (kitItem.startsWith("$") || kitItem.startsWith(currencySymbol)) {
+                    money = money.add(new BigDecimal(NumberUtil.sanitizeCurrencyString(kitItem, ess)));
+                    continue;
+                }
+
+                if (kitItem.startsWith("/")) {
+                    commands.add(kitItem.substring(1));
+                    continue;
+                }
+
+                if (kitItem.startsWith("slot:")) {
+                    final int spaceIndex = kitItem.indexOf(" ");
+                    if (spaceIndex != -1) {
+                        kitItem = kitItem.substring(spaceIndex + 1);
+                    }
+                }
+
+                final ItemStack stack;
+                final SerializationProvider serializationProvider = ess.provider(SerializationProvider.class);
+
+                if (kitItem.startsWith("@")) {
+                    if (serializationProvider == null) {
+                        continue;
+                    }
+                    stack = serializationProvider.deserializeItem(Base64Coder.decodeLines(kitItem.substring(1)));
+                } else {
+                    final String[] parts = kitItem.split(" +");
+                    final ItemStack parseStack = ess.getItemDb().get(parts[0], parts.length > 1 ? Integer.parseInt(parts[1]) : 1);
+
+                    if (parseStack.getType() == Material.AIR) {
+                        continue;
+                    }
+
+                    final MetaItemStack metaStack = new MetaItemStack(parseStack);
+
+                    if (parts.length > 2) {
+                        metaStack.parseStringMeta(null, allowUnsafe, parts, 2, ess);
+                    }
+
+                    stack = metaStack.getItemStack();
+                }
+
+                itemStacks.add(stack);
+            }
+        } catch (final Exception e) {
+            ess.getLogger().log(Level.WARNING, "Error pre-parsing kit " + kitName + ": " + e.getMessage());
+        }
+    }
+
+    private List<String> getItemsSilently() {
+        try {
+            return getItems();
+        } catch (final Exception e) {
+            return Collections.emptyList();
+        }
+    }
+
+    /**
+     * Looks up a kit previously registered via {@link #load(String, IEssentials)}.
+     * Intended for use by other plugins that want to inspect kit contents through
+     * {@link #getMoney()}, {@link #getItemStacks()}, {@link #getCommands()}.
+     */
+    public static Kit get(final String name) throws TranslatableException {
+        final Kit kit = cached.get(name.toLowerCase(Locale.ENGLISH));
+        if (kit == null) {
+            throw new TranslatableException("kitNotFound");
+        }
+        return kit;
+    }
+
+    public static void load(final String name, final IEssentials ess) {
+        try {
+            cached.put(name.toLowerCase(Locale.ENGLISH), new Kit(name, ess));
+        } catch (final Exception e) {
+            ess.getLogger().log(Level.WARNING, "Failed to cache kit " + name + ": " + e.getMessage());
+        }
+    }
+
+    public static void clearCache() {
+        cached.clear();
+    }
+
+    public BigDecimal getMoney() {
+        return money;
+    }
+
+    /** Defensive copy — other plugins can mutate the returned list safely. */
+    public List<ItemStack> getItemStacks() {
+        return itemStacks.stream().map(ItemStack::clone).collect(Collectors.toList());
+    }
+
+    public List<String> getCommands() {
+        return new ArrayList<>(commands);
     }
 
     public String getName() {

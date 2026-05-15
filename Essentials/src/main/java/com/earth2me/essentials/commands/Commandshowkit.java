@@ -22,7 +22,7 @@ public class Commandshowkit extends EssentialsCommand {
 
         for (final String kitName : args[0].toLowerCase(Locale.ENGLISH).split(",")) {
             user.sendTl("kitContains", kitName);
-            for (final String s : new Kit(kitName, ess).getItems()) {
+            for (final String s : Kit.get(kitName).getItems()) {
                 user.sendTl("kitItem", s);
             }
         }

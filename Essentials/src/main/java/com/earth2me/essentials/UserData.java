@@ -9,10 +9,12 @@ import com.earth2me.essentials.userstorage.ModernUserMap;
 import com.earth2me.essentials.utils.NumberUtil;
 import com.earth2me.essentials.utils.StringUtil;
 import com.google.common.base.Charsets;
+import combatlib.lib.sql.query.query.Query;
 import net.ess3.api.IEssentials;
 import net.ess3.api.MaxMoneyException;
 import net.ess3.api.TranslatableException;
 import net.essentialsx.api.v2.services.mail.MailMessage;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -57,6 +59,26 @@ public abstract class UserData extends PlayerExtension implements IConf {
         if (config.getUsername() == null) {
             config.setUsername(getLastAccountName());
         }
+        // Slon fork: load cross-server kit cooldowns from the shared MySQL table
+        updateKitsCooldowns();
+    }
+
+    /** Slon fork: in-memory mirror of the {@code kits_cooldowns} MySQL table for this user. */
+    private final Map<String, Long> kitsCooldowns = new HashMap<>();
+
+    /**
+     * Reloads kit cooldowns from MySQL into {@link #kitsCooldowns}. Called on user load
+     * and whenever the player rejoins so cooldowns set by sibling servers are picked up.
+     */
+    public void updateKitsCooldowns() {
+        if (ess == null || base == null || base.getName() == null) {
+            return;
+        }
+        Query.select().all().from("kits_cooldowns").where("player", base.getName().toLowerCase())
+                .queryAndMapAll(ess.getConnection(), rs -> {
+                    kitsCooldowns.put(rs.getString("kit"), rs.getLong("date"));
+                    return null;
+                });
     }
 
     public final void reset() {
@@ -640,16 +662,20 @@ public abstract class UserData extends PlayerExtension implements IConf {
 
     public long getKitTimestamp(String name) {
         name = name.replace('.', '_').replace('/', '_').toLowerCase(Locale.ENGLISH);
-        if (holder.timestamps().kits() != null && holder.timestamps().kits().containsKey(name)) {
-            return holder.timestamps().kits().get(name);
-        }
-        return 0L;
+        return kitsCooldowns.getOrDefault(name, 0L);
     }
 
     public void setKitTimestamp(String name, final long time) {
         name = name.replace('.', '_').replace('/', '_').toLowerCase(Locale.ENGLISH);
-        holder.timestamps().kits().put(name, time);
-        config.save();
+        kitsCooldowns.put(name, time);
+        final String finalName = name;
+        // Cross-server cooldown sync via CombatLib MySQL — done async to keep the kit-claim path snappy
+        Bukkit.getScheduler().runTaskAsynchronously(ess, () -> Query.insertInto("kits_cooldowns")
+                .value("player", base.getName().toLowerCase())
+                .value("kit", finalName)
+                .value("date", time)
+                .onDuplicateKeyUpdateExcept("player", "kit")
+                .update(ess.getConnection()));
     }
 
     public List<CommandCooldown> getCooldownsList() {

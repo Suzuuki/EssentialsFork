@@ -26,6 +26,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.spongepowered.configurate.CommentedConfigurationNode;
+import su.combat.simpleperms.Entity.SimpleUser;
+import su.combat.simpleperms.SimplePermsCommon;
 
 import java.io.File;
 import java.math.BigDecimal;
@@ -201,20 +203,15 @@ public class Settings implements net.ess3.api.ISettings {
 
     @Override
     public int getHomeLimit(final User user) {
-        int limit = 1;
-        if (user.isAuthorized("essentials.sethome.multiple")) {
-            limit = getHomeLimit("default");
+        // Slon fork: home limit comes from SimplePerms options on this user
+        //   base-sethome-amount        — baseline number of homes for the user's group
+        //   additional-sethome-amount  — per-user bonus (e.g. donations)
+        // Falls back to a base of 1 when no option is set so a brand-new player still gets one home.
+        final SimpleUser simpleUser = SimplePermsCommon.getUser(user.getName());
+        if (simpleUser == null) {
+            return 1;
         }
-
-        final Set<String> homeList = getMultipleHomes();
-        if (homeList != null) {
-            for (final String set : homeList) {
-                if (user.isAuthorized("essentials.sethome.multiple." + set) && limit < getHomeLimit(set)) {
-                    limit = getHomeLimit(set);
-                }
-            }
-        }
-        return limit;
+        return simpleUser.getIntOption("base-sethome-amount", 1) + simpleUser.getIntOption("additional-sethome-amount", 0);
     }
 
     @Override
@@ -1929,6 +1926,23 @@ public class Settings implements net.ess3.api.ISettings {
     @Override
     public boolean isKitAutoEquip() {
         return config.getBoolean("kit-auto-equip", false);
+    }
+
+    // Slon fork: optional plugin integrations — default off so a server without
+    // the relevant plugins behaves like vanilla EssentialsX.
+    @Override
+    public boolean isKitBlockerEnabled() {
+        return config.getBoolean("slon-fork.kit-blocker-enabled", false);
+    }
+
+    @Override
+    public boolean isSetHomeRegionProtectEnabled() {
+        return config.getBoolean("slon-fork.sethome-region-protect-enabled", false);
+    }
+
+    @Override
+    public boolean isSetHomeWGFlagEnabled() {
+        return config.getBoolean("slon-fork.sethome-wg-flag-enabled", false);
     }
 
     @Override

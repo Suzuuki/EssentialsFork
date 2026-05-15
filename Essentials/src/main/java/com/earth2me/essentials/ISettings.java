@@ -379,6 +379,13 @@ public interface ISettings extends IConf {
 
     boolean isKitAutoEquip();
 
+    // Slon fork — optional plugin integration toggles
+    boolean isKitBlockerEnabled();
+
+    boolean isSetHomeRegionProtectEnabled();
+
+    boolean isSetHomeWGFlagEnabled();
+
     boolean isPastebinCreateKit();
 
     boolean isUseBetterKits();

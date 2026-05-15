@@ -33,6 +33,12 @@ public class Kits implements IConf {
     public void reloadConfig() {
         rootConfig.load();
         parseKits();
+        doCache();
+    }
+
+    /** Pre-loads all kits into {@link Kit}'s static cache so other plugins can look them up via {@link Kit#get(String)}. */
+    public void doCache() {
+        kitMap.keySet().forEach(kitName -> Kit.load(kitName, (net.ess3.api.IEssentials) ess));
     }
 
     public File getFile() {
@@ -50,6 +56,7 @@ public class Kits implements IConf {
     private void parseKits() {
         kitToConfigMap.clear();
         kitMap.clear();
+        Kit.clearCache();
 
         // Kits from kits.yml file
         final CommentedConfigurationNode fileKits = rootConfig.getSection("kits");

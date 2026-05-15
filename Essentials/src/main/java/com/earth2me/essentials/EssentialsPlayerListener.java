@@ -542,6 +542,10 @@ public class EssentialsPlayerListener implements Listener {
         user.setConfirmingClearCommand(null);
         user.getConfirmingPayments().clear();
 
+        // Slon fork: refresh kit cooldowns from MySQL on each join so a cooldown
+        // set on another server in the network shows up immediately here.
+        user.updateKitsCooldowns();
+
         user.stopTransaction();
     }
 

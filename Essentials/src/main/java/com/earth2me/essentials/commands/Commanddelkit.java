@@ -21,7 +21,7 @@ public class Commanddelkit extends EssentialsCommand {
             throw new NoChargeException();
         } else {
             final String kitName = ess.getKits().matchKit(args[0]);
-            final Kit kit = new Kit(kitName, ess);
+            final Kit kit = Kit.get(kitName);
 
             if (sender.getPlayer() != null) {
                 kit.checkPerms(ess.getUser(sender.getPlayer()));
