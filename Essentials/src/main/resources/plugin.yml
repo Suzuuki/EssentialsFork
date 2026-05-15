@@ -5,10 +5,13 @@ version: ${full.version}
 website: https://essentialsx.net/
 description: Provides an essential, core set of commands for Bukkit.
 depend: [CombatLib, SimplePerms, XEconomy]
-# KitBlocker / RegionProtect / WGSetHomeHook are runtime-optional — the relevant
-# features only activate when both the plugin is installed AND its toggle is enabled
-# under the `custom:` section of config.yml.
-softdepend: [Vault, LuckPerms, KitBlocker, RegionProtect, WGSetHomeHook]
+# KitBlocker / RegionProtect / WGSetHomeHook are runtime-optional and intentionally
+# NOT listed in softdepend: they (transitively) depend on Essentials themselves, so
+# adding them here creates a Paper plugin-load cycle. The hooks check
+# Bukkit.getPluginManager().isPluginEnabled(...) at command time instead of relying
+# on load order, so this is safe — by the time a player runs /kit or /sethome the
+# server has finished enabling every plugin.
+softdepend: [Vault, LuckPerms]
 authors: [Zenexer, ementalo, Aelux, Brettflan, KimKandor, snowleo, ceulemans, Xeology, KHobbits, md_5, Iaccidentally, drtshock, vemacs, SupaHam, mdcfe, JRoy, pop4959]
 api-version: "1.13"
 commands:
