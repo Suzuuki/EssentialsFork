@@ -59,11 +59,11 @@ public abstract class UserData extends PlayerExtension implements IConf {
         if (config.getUsername() == null) {
             config.setUsername(getLastAccountName());
         }
-        // Slon fork: load cross-server kit cooldowns from the shared MySQL table
+        // load cross-server kit cooldowns from the shared MySQL table
         updateKitsCooldowns();
     }
 
-    /** Slon fork: in-memory mirror of the {@code kits_cooldowns} MySQL table for this user. */
+    /** in-memory mirror of the {@code kits_cooldowns} MySQL table for this user. */
     private final Map<String, Long> kitsCooldowns = new HashMap<>();
 
     /**

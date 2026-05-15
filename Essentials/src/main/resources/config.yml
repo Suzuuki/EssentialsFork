@@ -365,13 +365,13 @@ skip-used-one-time-kits-from-kit-list: false
 kit-auto-equip: false
 
 # ============================================================================
-# Slon fork — optional plugin integrations.
+# — optional plugin integrations.
 # All of these default to OFF: with no plugins installed and no toggles changed,
 # this build behaves like vanilla EssentialsX. Each toggle gates a single hook
 # and is also guarded at runtime by a plugin-installed check, so flipping a
 # toggle on without the plugin present is a no-op (not a crash).
 # ============================================================================
-slon-fork:
+custom:
   # Block kit usage during a wipe / pre-release window. Requires the KitBlocker plugin.
   # While active, /kit <name> is refused with the kitBlocked message, except for the
   # "start" kit which is always allowed so players can claim their starter gear.

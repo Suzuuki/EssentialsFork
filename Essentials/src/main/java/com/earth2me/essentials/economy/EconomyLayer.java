@@ -32,7 +32,7 @@ public interface EconomyLayer {
     boolean withdraw(OfflinePlayer player, BigDecimal amount);
 
     default boolean set(OfflinePlayer player, BigDecimal amount) {
-        // Slon fork: write directly to XEconomy so the value is exact and we don't
+        // write directly to XEconomy so the value is exact and we don't
         // round-trip via withdraw(balance) + deposit — that pattern fails for
         // accounts in overdraft because withdraw refuses negative balances.
         XEconomy.getPlayer(player.getName()).set(amount.doubleValue());

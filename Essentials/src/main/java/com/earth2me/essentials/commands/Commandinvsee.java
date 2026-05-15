@@ -26,7 +26,7 @@ public class Commandinvsee extends EssentialsCommand {
             throw new NoChargeException();
         }
 
-        // Slon fork: per-player invsee opt-out. Players with essentials.invsee.preventsee
+        // per-player invsee opt-out. Players with essentials.invsee.preventsee
         // (typically staff/VIPs holding sensitive items) hide their inventory from
         // other invsee users unless the viewer has essentials.invsee.preventsee.bypass.
         if (invUser.getBase().hasPermission("essentials.invsee.preventsee")

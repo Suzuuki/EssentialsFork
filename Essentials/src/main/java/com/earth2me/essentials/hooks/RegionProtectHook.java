@@ -7,12 +7,12 @@ import ru.kaingross.regionprotect.data.Region;
 import ru.kaingross.regionprotect.data.RegionManager;
 
 /**
- * Slon fork: optional RegionProtect integration used to block /sethome inside
+ * optional RegionProtect integration used to block /sethome inside
  * other players' protected regions. Falls back to "no restriction" when the
  * plugin is not installed.
  *
  * Enable in EssentialsX config:
- *   slon-fork:
+ *   custom:
  *     sethome-region-protect-enabled: true
  */
 public final class RegionProtectHook {

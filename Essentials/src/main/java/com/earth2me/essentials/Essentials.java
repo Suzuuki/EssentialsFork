@@ -191,7 +191,7 @@ public class Essentials extends JavaPlugin implements net.ess3.api.IEssentials {
     private transient RandomTeleport randomTeleport;
     private transient UpdateChecker updateChecker;
     private transient AdventureFacet adventureFacet;
-    // Slon fork: shared CombatLib MySQL connection for cross-server kit cooldown sync
+    // shared CombatLib MySQL connection for cross-server kit cooldown sync
     private final transient MySqlDatabase database = new MySqlDatabase("global");
 
     static {
@@ -302,7 +302,7 @@ public class Essentials extends JavaPlugin implements net.ess3.api.IEssentials {
             kits = new Kits(this);
             confList.add(kits);
             upgrade.convertKits();
-            // Slon fork: ensure kit cache is populated for the public Kit API and create the cross-server cooldown table
+            // ensure kit cache is populated for the public Kit API and create the cross-server cooldown table
             kits.doCache();
             Query.createTable("kits_cooldowns").ifNotExists()
                     .varchar("player", 32).PK()

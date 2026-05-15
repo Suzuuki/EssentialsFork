@@ -7,7 +7,7 @@ description: Provides an essential, core set of commands for Bukkit.
 depend: [CombatLib, SimplePerms, XEconomy]
 # KitBlocker / RegionProtect / WGSetHomeHook are runtime-optional — the relevant
 # features only activate when both the plugin is installed AND its toggle is enabled
-# under the `slon-fork:` section of config.yml.
+# under the `custom:` section of config.yml.
 softdepend: [Vault, LuckPerms, KitBlocker, RegionProtect, WGSetHomeHook]
 authors: [Zenexer, ementalo, Aelux, Brettflan, KimKandor, snowleo, ceulemans, Xeology, KHobbits, md_5, Iaccidentally, drtshock, vemacs, SupaHam, mdcfe, JRoy, pop4959]
 api-version: "1.13"
@@ -915,10 +915,10 @@ permissions:
     description: Prevents other players from modifying the players inventory.
   essentials.invsee.preventsee:
     default: false
-    description: Slon fork — prevents other players from viewing this player's inventory via /invsee.
+    description: — prevents other players from viewing this player's inventory via /invsee.
   essentials.invsee.preventsee.bypass:
     default: false
-    description: Slon fork — bypasses essentials.invsee.preventsee on other players.
+    description: — bypasses essentials.invsee.preventsee on other players.
   essentials.item:
     description: Allows access to the /item command
   essentials.itemspawn.exempt:
@@ -1160,7 +1160,7 @@ permissions:
     description: Allows access to use the /repair command on enchanted items
   essentials.repair.others:
     default: false
-    description: Slon fork — allows /repair all <player> to repair another player's inventory.
+    description: — allows /repair all <player> to repair another player's inventory.
   essentials.rest:
     description: Allows access to the /rest command
   essentials.rest.others:

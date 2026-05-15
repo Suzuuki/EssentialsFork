@@ -5,12 +5,12 @@ import org.bukkit.Location;
 import ru.sasuke.wgsethomehook.WorldGuardHook;
 
 /**
- * Slon fork: optional WGSetHomeHook integration. Looks up the WorldGuard
+ * optional WGSetHomeHook integration. Looks up the WorldGuard
  * {@code use-sethome} flag at a location and answers whether /sethome should
  * be allowed there. Returns "allow" by default when the plugin is missing.
  *
  * Enable in EssentialsX config:
- *   slon-fork:
+ *   custom:
  *     sethome-wg-flag-enabled: true
  */
 public final class WGSetHomeHookBridge {

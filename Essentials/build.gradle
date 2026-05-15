@@ -8,7 +8,7 @@ dependencies {
     }
     compileOnly 'net.luckperms:api:5.3'
 
-    // Slon fork: local server-side plugin jars (compileOnly — provided at runtime by the server)
+    // local server-side plugin jars (compileOnly — provided at runtime by the server)
     compileOnly files('D:/projects/CombatLib-1.16.5.jar')
     compileOnly files('D:/projects/SimplePerms-1.0.jar')
     compileOnly files('D:/projects/XEconomy-1.0.jar')

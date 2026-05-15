@@ -58,7 +58,7 @@ public class Commandkit extends EssentialsCommand {
             throw new TranslatableException("kitNotFound");
         }
 
-        // Slon fork: KitBlocker integration. When kits are globally blocked
+        // KitBlocker integration. When kits are globally blocked
         // (typically during a wipe window), refuse with a translated message
         // and the "no" villager sound. The "start" kit is always exempt so
         // players can still claim their starter kit during the lockout.

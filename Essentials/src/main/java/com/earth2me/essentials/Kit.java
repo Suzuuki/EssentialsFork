@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 import static com.earth2me.essentials.I18n.tlLiteral;
 
 public class Kit {
-    // Slon fork: pre-parsed kit cache exposed to other plugins via Kit.get(name).
+    // pre-parsed kit cache exposed to other plugins via Kit.get(name).
     // Internal expandItems() still re-parses YAML per call so upstream features
     // (slot:, keyword replacement, events) keep working.
     private static final Map<String, Kit> cached = new ConcurrentHashMap<>();

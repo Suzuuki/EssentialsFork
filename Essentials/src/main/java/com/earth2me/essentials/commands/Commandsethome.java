@@ -58,7 +58,7 @@ public class Commandsethome extends EssentialsCommand {
             throw new TranslatableException("unsafeTeleportDestination", location.getWorld().getName(), location.getBlockX(), location.getBlockY(), location.getBlockZ());
         }
 
-        // Slon fork: optional sethome region checks. Both hooks short-circuit safely
+        // optional sethome region checks. Both hooks short-circuit safely
         // when the underlying plugin is absent or the toggle is off, so vanilla
         // EssentialsX behavior is preserved by default.
         //   - RegionProtect: deny when standing inside a region the player is not a member/owner of

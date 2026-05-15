@@ -153,6 +153,6 @@ public interface IEssentials extends Plugin {
 
     AdventureFacet getAdventureFacet();
 
-    /** Slon fork: shared CombatLib MySQL connection (used for cross-server kit cooldown sync). */
+    /** shared CombatLib MySQL connection (used for cross-server kit cooldown sync). */
     Connection getConnection();
 }

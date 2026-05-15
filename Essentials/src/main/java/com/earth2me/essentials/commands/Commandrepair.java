@@ -32,7 +32,7 @@ public class Commandrepair extends EssentialsCommand {
             final Trade charge = new Trade("repair-all", ess);
             charge.isAffordableFor(user);
 
-            // Slon fork: /repair all <player> — repair another player's inventory.
+            // /repair all <player> — repair another player's inventory.
             // Permission used: essentials.repair.others.
             // The cost is still charged to the caller. Armor/enchant repair flags are
             // resolved against the caller's own permissions so a staffer's perms apply
@@ -83,7 +83,7 @@ public class Commandrepair extends EssentialsCommand {
     }
 
     /**
-     * Slon fork: repair {@code target}'s inventory while charging {@code payer}.
+     * repair {@code target}'s inventory while charging {@code payer}.
      * The {@code repairArmor} / {@code repairEnchanted} flags are resolved by the caller
      * (typically from the payer's permissions) so repair scope follows staff authority.
      */
@@ -172,7 +172,7 @@ public class Commandrepair extends EssentialsCommand {
             }
             return options;
         } else if (args.length == 2 && "all".equalsIgnoreCase(args[0]) && user.isAuthorized("essentials.repair.others")) {
-            // Slon fork: complete target player names for /repair all <player>
+            // complete target player names for /repair all <player>
             return getPlayers(user);
         } else {
             return Collections.emptyList();

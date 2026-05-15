@@ -5,14 +5,14 @@ import org.bukkit.entity.Player;
 import ru.sasuke.kitblocker.Main;
 
 /**
- * Slon fork: optional KitBlocker integration. KitBlocker globally blocks kit usage
+ * optional KitBlocker integration. KitBlocker globally blocks kit usage
  * (typically during a wipe / pre-release window). All access goes through this
  * wrapper so the rest of EssentialsX has no static dependency on KitBlocker —
  * if the plugin is missing, {@link #isAvailable()} returns false and the rest
  * of the methods return safe defaults.
  *
  * Enable in EssentialsX config:
- *   slon-fork:
+ *   custom:
  *     kit-blocker-enabled: true
  */
 public final class KitBlockerHook {

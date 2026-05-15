@@ -203,7 +203,7 @@ public class Settings implements net.ess3.api.ISettings {
 
     @Override
     public int getHomeLimit(final User user) {
-        // Slon fork: home limit comes from SimplePerms options on this user
+        // home limit comes from SimplePerms options on this user
         //   base-sethome-amount        — baseline number of homes for the user's group
         //   additional-sethome-amount  — per-user bonus (e.g. donations)
         // Falls back to a base of 1 when no option is set so a brand-new player still gets one home.
@@ -1928,21 +1928,21 @@ public class Settings implements net.ess3.api.ISettings {
         return config.getBoolean("kit-auto-equip", false);
     }
 
-    // Slon fork: optional plugin integrations — default off so a server without
+    // optional plugin integrations — default off so a server without
     // the relevant plugins behaves like vanilla EssentialsX.
     @Override
     public boolean isKitBlockerEnabled() {
-        return config.getBoolean("slon-fork.kit-blocker-enabled", false);
+        return config.getBoolean("custom.kit-blocker-enabled", false);
     }
 
     @Override
     public boolean isSetHomeRegionProtectEnabled() {
-        return config.getBoolean("slon-fork.sethome-region-protect-enabled", false);
+        return config.getBoolean("custom.sethome-region-protect-enabled", false);
     }
 
     @Override
     public boolean isSetHomeWGFlagEnabled() {
-        return config.getBoolean("slon-fork.sethome-wg-flag-enabled", false);
+        return config.getBoolean("custom.sethome-wg-flag-enabled", false);
     }
 
     @Override
