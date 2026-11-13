@@ -221,6 +221,14 @@ public abstract class AbstractItemDb implements IConf, net.ess3.api.IItemDb {
                 }
             }
 
+            // Round-trip the max_stack_size component so /createkit does not lose stack sizes
+            // raised by other plugins; MetaItemStack reads this token back on kit claim.
+            if (VersionUtil.getServerBukkitVersion().isHigherThanOrEqualTo(VersionUtil.v1_20_6_R01)) {
+                if (meta.hasMaxStackSize()) {
+                    sb.append("max-stack-size:").append(meta.getMaxStackSize()).append(" ");
+                }
+            }
+
             if (meta.hasEnchants()) {
                 for (final Enchantment e : meta.getEnchants().keySet()) {
                     sb.append(Enchantments.getRealName(e)).append(":").append(meta.getEnchantLevel(e)).append(" ");

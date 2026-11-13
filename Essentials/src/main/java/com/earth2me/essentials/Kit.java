@@ -143,6 +143,13 @@ public class Kit {
     }
 
     public static void load(final String name, final IEssentials ess) {
+        // Skip while Essentials.kits is still null — this happens because Kits' constructor
+        // chains reloadConfig() → doCache() → Kit.load() BEFORE the `kits = new Kits(this)`
+        // assignment in Essentials.java completes. The external doCache() call right after
+        // that assignment re-runs the same loop and actually populates the cache.
+        if (ess.getKits() == null) {
+            return;
+        }
         try {
             cached.put(name.toLowerCase(Locale.ENGLISH), new Kit(name, ess));
         } catch (final Exception e) {
@@ -387,9 +394,15 @@ public class Kit {
             for (final ItemStack itemStack : leftover.values()) {
                 int spillAmount = itemStack.getAmount();
                 while (spillAmount > 0) {
+                    // Всегда режем по vanilla max-stack: иначе в 1.21 codec валит сериализацию
+                    // ItemEntity с amount > 99 ("Value must be within range [1;99]"), плюс
+                    // дропать стак 128 эл.бутылок просто некорректно. Ранее условие
+                    // 'if (maxStackSize != 0)' пропускало этот шаг для vanilla-режима.
+                    int perDrop = Math.min(spillAmount, itemStack.getMaxStackSize());
                     if (maxStackSize != 0) {
-                        itemStack.setAmount(Math.min(spillAmount, itemStack.getMaxStackSize()));
+                        perDrop = Math.min(perDrop, maxStackSize);
                     }
+                    itemStack.setAmount(perDrop);
                     user.getWorld().dropItemNaturally(user.getLocation(), itemStack);
                     spillAmount -= itemStack.getAmount();
                 }

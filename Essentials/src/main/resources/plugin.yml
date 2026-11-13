@@ -938,6 +938,8 @@ permissions:
     description: Allows the bearer to spawn items with head metadata
   essentials.itemspawn.meta-lore:
     description: Allows the bearer to spawn items with lore metadata
+  essentials.itemspawn.meta-max-stack-size:
+    description: Allows the bearer to spawn items with a custom max stack size
   essentials.itemspawn.meta-title:
     description: Allows the bearer to spawn items with title metadata
   essentials.itemlore:

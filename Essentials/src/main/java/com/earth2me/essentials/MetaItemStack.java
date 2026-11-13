@@ -276,6 +276,16 @@ public class MetaItemStack {
                 meta.setCustomModelData(value);
                 stack.setItemMeta(meta);
             }
+        } else if (split.length > 1 && (split[0].equalsIgnoreCase("max-stack-size") || split[0].equalsIgnoreCase("maxstacksize") || split[0].equalsIgnoreCase("stacksize")) && hasMetaPermission(sender, "max-stack-size", false, true, ess)) {
+            // Preserves the max_stack_size component (1.20.5+). Without it, an item whose stack
+            // size was raised by another plugin (PotionStacker etc.) is split back to the vanilla
+            // limit when a kit is granted, and the overflow ends up on the ground.
+            if (VersionUtil.getServerBukkitVersion().isHigherThanOrEqualTo(VersionUtil.v1_20_6_R01) && NumberUtil.isInt(split[1])) {
+                final int value = Math.max(1, Math.min(99, Integer.parseInt(split[1])));
+                final ItemMeta meta = stack.getItemMeta();
+                meta.setMaxStackSize(value);
+                stack.setItemMeta(meta);
+            }
         } else if (split[0].equalsIgnoreCase("unbreakable") && hasMetaPermission(sender, "unbreakable", false, true, ess)) {
             final boolean value = split.length <= 1 || Boolean.parseBoolean(split[1]);
             setUnbreakable(ess, stack, value);
