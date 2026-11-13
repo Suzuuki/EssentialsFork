@@ -49,8 +49,8 @@ import com.earth2me.essentials.utils.FormatUtil;
 import com.earth2me.essentials.utils.ModernPaperEnvironment;
 import com.earth2me.essentials.utils.PasteUtil;
 import com.earth2me.essentials.utils.VersionUtil;
-import combatlib.lib.sql.MySqlDatabase;
-import combatlib.lib.sql.query.query.Query;
+import combatlib.lib.sql.NamedMySQLDatabase;
+import ru.kaingross.ccore.base.sql.query.query.Query;
 import io.papermc.lib.PaperLib;
 import net.ess3.api.Economy;
 import com.earth2me.essentials.config.EssentialsConfiguration;
@@ -138,7 +138,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.sql.Connection;
+import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -192,7 +192,7 @@ public class Essentials extends JavaPlugin implements net.ess3.api.IEssentials {
     private transient UpdateChecker updateChecker;
     private transient AdventureFacet adventureFacet;
     // shared CombatLib MySQL connection for cross-server kit cooldown sync
-    private final transient MySqlDatabase database = new MySqlDatabase("global");
+    private final transient NamedMySQLDatabase database = new NamedMySQLDatabase("global");
 
     static {
         EconomyLayers.init();
@@ -307,7 +307,7 @@ public class Essentials extends JavaPlugin implements net.ess3.api.IEssentials {
             Query.createTable("kits_cooldowns").ifNotExists()
                     .varchar("player", 32).PK()
                     .varchar("kit", 64).PK()
-                    .bigint("date").update(getConnection());
+                    .bigint("date").update(getDataSource());
             execTimer.mark("Kits");
 
             randomTeleport = new RandomTeleport(this);
@@ -1369,8 +1369,8 @@ public class Essentials extends JavaPlugin implements net.ess3.api.IEssentials {
     }
 
     @Override
-    public Connection getConnection() {
-        return database.getConnection();
+    public DataSource getDataSource() {
+        return database.getDataSource();
     }
 
     @Override

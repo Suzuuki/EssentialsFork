@@ -9,7 +9,7 @@ import com.earth2me.essentials.userstorage.ModernUserMap;
 import com.earth2me.essentials.utils.NumberUtil;
 import com.earth2me.essentials.utils.StringUtil;
 import com.google.common.base.Charsets;
-import combatlib.lib.sql.query.query.Query;
+import ru.kaingross.ccore.base.sql.query.query.Query;
 import net.ess3.api.IEssentials;
 import net.ess3.api.MaxMoneyException;
 import net.ess3.api.TranslatableException;
@@ -75,7 +75,7 @@ public abstract class UserData extends PlayerExtension implements IConf {
             return;
         }
         Query.select().all().from("kits_cooldowns").where("player", base.getName().toLowerCase())
-                .queryAndMapAll(ess.getConnection(), rs -> {
+                .queryAndMapAll(ess.getDataSource(), rs -> {
                     kitsCooldowns.put(rs.getString("kit"), rs.getLong("date"));
                     return null;
                 });
@@ -675,7 +675,7 @@ public abstract class UserData extends PlayerExtension implements IConf {
                 .value("kit", finalName)
                 .value("date", time)
                 .onDuplicateKeyUpdateExcept("player", "kit")
-                .update(ess.getConnection()));
+                .update(ess.getDataSource()));
     }
 
     public List<CommandCooldown> getCooldownsList() {

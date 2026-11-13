@@ -9,7 +9,10 @@ dependencies {
     compileOnly 'net.luckperms:api:5.3'
 
     // local server-side plugin jars (compileOnly — provided at runtime by the server)
-    compileOnly files('D:/projects/CombatLib-1.16.5.jar')
+    // Именно слоновский CombatLib, а не fillcube'овский: раньше тут стоял
+    // fillcube/combatLib/.../CombatLib-1.0.0C.jar — другой проект со своими правками,
+    // и Essentials компилировался против одного API, а запускался с другим.
+    compileOnly files('D:/projects/slon/CombatLib/target/CombatLib-1.21.11.jar')
     compileOnly files('D:/projects/SimplePerms-1.0.jar')
     compileOnly files('D:/projects/XEconomy-1.0.jar')
     // Optional integrations (enabled via config + softdepend in plugin.yml)
